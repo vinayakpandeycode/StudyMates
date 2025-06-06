@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMates - Your Study Room</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .user-info, .verification-section, .matched-users {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .user-info p, .verification-section p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+        .verification-section form {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .verification-section label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .verification-section input[type="file"] {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .verification-section button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .verification-section button:hover {
+            background-color: #0056b3;
+        }
+        #verificationMessage {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        #verificationMessage.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        #verificationMessage.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        #verificationMessage.info {
+            background-color: #cfe2ff;
+            color: #052c65;
+            border-color: #b6d4fe;
+        }
+        .matched-users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .user-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+        .user-card strong {
+            color: #0056b3;
+        }
+        .user-card p {
+            margin: 8px 0;
+        }
+        .whatsapp-link {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #25d366;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .whatsapp-link:hover {
+            background-color: #128c7e;
+        }
+        .status-verified {
+            color: green;
+            font-weight: bold;
+        }
+        .status-not-verified {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Study Room, {{ current_user.name }}!</h1>
+
+        <div class="user-info">
+            <h2>Your Details:</h2>
+            <p><strong>Name:</strong> {{ current_user.name }}</p>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p><strong>Year:</strong> {{ current_user.year }}{% if current_user.year == "1" %} (Subjects: {{ current_user.subjects }}){% else %} (Specialization: {{ current_user.specialization }}){% endif %}</p>
+            <p><strong>Desired Group Size:</strong> {{ current_user.group_size }}</p>
+            <p><strong>Your Session ID:</strong> {{ current_user.session_id }}</p>
+            <p><strong>Your Tab ID:</strong> {{ current_user.tab_id }}</p>
+            <p><strong>Your Verification Status:</strong>
+                {% if current_user.is_verified %}
+                    <span class="status-verified">Verified ✅</span>
+                {% else %}
+                    <span class="status-not-verified">Not Verified ❌</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="verification-section">
+            <h2>ID Verification</h2>
+            {% if current_user.is_verified %}
+                <p class="status-verified">Your ID is **Verified!** You can now see WhatsApp numbers of other verified users.</p>
+            {% else %}
+                <p class="status-not-verified">Your ID is **NOT Verified.** Please upload your student ID card to unlock full features and see contact details of your matched study mates.</p>
+                <form id="idVerificationForm" enctype="multipart/form-data">
+                    <label for="id_card">Upload your Student ID Card (Image: JPG, PNG, JPEG):</label>
+                    <input type="file" id="id_card" name="id_card" accept="image/jpeg, image/png, image/jpg" required>
+                    <button type="submit">Verify My ID</button>
+                    <div id="verificationMessage"></div>
+                </form>
+            {% endif %}
+        </div>
+
+        <div class="matched-users">
+            <h2>Matched Study Mates:</h2>
+            {% if matched_users %}
+                <div class="matched-users-grid">
+                    {% for user in matched_users %}
+                        <div class="user-card">
+                            <p><strong>Name:</strong> {{ user.name }}</p>
+                            <p><strong>Year:</strong> {{ user.year }}{% if user.year == "1" %} (Subjects: {{ user.subjects }}){% else %} (Specialization: {{ user.specialization }}){% endif %}</p>
+                            <p><strong>Desired Group Size:</strong> {{ user.group_size }}</p>
+                            <p><strong>Verification Status:</strong>
+                                {% if user.is_verified %}
+                                    <span class="status-verified">Verified ✅</span>
+                                {% else %}
+                                    <span class="status-not-verified">Not Verified ❌</span>
+                                {% endif %}
+                            </p>
+                            {% if user.is_verified and current_user.is_verified %}
+                                <a href="https://wa.me/{{ user.whatsapp }}" target="_blank" class="whatsapp-link">
+                                    WhatsApp: {{ user.whatsapp }}
+                                </a>
+                            {% else %}
+                                <p>WhatsApp: <span style="font-style: italic; color: #6c757d;">(Hidden - both parties must be verified)</span></p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No study mates matched yet. Share your room link or wait for others to join!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const verificationForm = document.getElementById('idVerificationForm');
+            const verificationMessage = document.getElementById('verificationMessage');
+            const currentUserId = "{{ current_user.tab_id }}"; // Get the current user's tab_id
+
+            if (verificationForm) {
+                verificationForm.addEventListener('submit', async function(event) {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const formData = new FormData();
+                    const idCardFile = document.getElementById('id_card').files[0];
+                    if (idCardFile) {
+                        formData.append('id_card', idCardFile);
+                        formData.append('tab_id', currentUserId); // Include current user's tab_id
+                    } else {
+                        verificationMessage.textContent = 'Please select an ID card image to upload.';
+                        verificationMessage.className = 'error';
+                        return;
+                    }
+
+                    verificationMessage.textContent = 'Uploading and verifying ID... This may take a moment.';
+                    verificationMessage.className = 'info';
+
+                    try {
+                        const response = await fetch('/verify-id', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+
+                        if (data.status === 'success') {
+                            verificationMessage.textContent = data.message;
+                            verificationMessage.className = 'success';
+                            // Reload the page to update verification status and potentially show WhatsApp numbers
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            verificationMessage.textContent = 'Error: ' + data.message;
+                            verificationMessage.className = 'error';
+                        }
+                    } catch (error) {
+                        console.error('Error during verification:', error);
+                        verificationMessage.textContent = 'An unexpected error occurred during verification. Please try again.';
+                        verificationMessage.className = 'error';
+                    }
+                });
+            }
+
+            // Polling for room status updates (e.g., verification status of others)
+            // This is a basic way to get updates without full WebSockets
+            setInterval(async () => {
+                try {
+                    const response = await fetch('/room-status?tab_id=' + currentUserId); // Pass tab_id for context
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        // For a hackathon, a simple reload might be acceptable for updates.
+                        // For a production app, you would dynamically update the matched users list
+                        // based on `data.matched_users` and `data.all_verified`.
+                        // Example: if (data.all_verified && !document.querySelector('.status-verified')) { location.reload(); }
+                        // For now, we'll just log and rely on the manual reload after verification for core updates.
+                        // You could refine this to update only the matched users section dynamically.
+                        console.log("Room status updated. User count:", data.user_count, "All verified:", data.all_verified);
+                    } else {
+                        console.warn('Room status error:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error fetching room status:', error);
+                }
+            }, 10000); // Poll every 10 seconds
+        });
+    </script>
+</body>
+</html>

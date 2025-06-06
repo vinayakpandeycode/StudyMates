@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMates - Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="number"],
+        form select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        form input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+        }
+        form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register for StudyMates</h1>
+        <form action="/submit" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br>
+
+            <label for="year">Year:</label>
+            <select id="year" name="year" required onchange="toggleAcademicFields()">
+                <option value="">Select Year</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+            </select><br>
+
+            <div id="subjects-field" class="hidden">
+                <label for="subjects">Subjects (1st Year, comma-separated):</label>
+                <input type="text" id="subjects" name="subjects"><br>
+            </div>
+
+            <div id="specialization-field" class="hidden">
+                <label for="specialization">Specialization (e.g., CSE, ECE, Mech):</label>
+                <input type="text" id="specialization" name="specialization"><br>
+            </div>
+
+            <label for="group-size">Desired Group Size (2-10):</label>
+            <input type="number" id="group-size" name="group-size" min="2" max="10" required><br>
+
+            <label for="whatsapp">WhatsApp Number:</label>
+            <input type="text" id="whatsapp" name="whatsapp" required><br>
+
+            <input type="submit" value="Register">
+        </form>
+    </div>
+
+    <script>
+        function toggleAcademicFields() {
+            const yearSelect = document.getElementById('year');
+            const subjectsField = document.getElementById('subjects-field');
+            const specializationField = document.getElementById('specialization-field');
+
+            if (yearSelect.value === '1') {
+                subjectsField.classList.remove('hidden');
+                specializationField.classList.add('hidden');
+                document.getElementById('subjects').setAttribute('required', 'required');
+                document.getElementById('specialization').removeAttribute('required');
+            } else if (yearSelect.value !== '') {
+                subjectsField.classList.add('hidden');
+                specializationField.classList.remove('hidden');
+                document.getElementById('specialization').setAttribute('required', 'required');
+                document.getElementById('subjects').removeAttribute('required');
+            } else {
+                subjectsField.classList.add('hidden');
+                specializationField.classList.add('hidden');
+                document.getElementById('subjects').removeAttribute('required');
+                document.getElementById('specialization').removeAttribute('required');
+            }
+        }
+        // Call on load to handle initial state if user navigates back
+        toggleAcademicFields();
+    </script>
+</body>
+</html>
