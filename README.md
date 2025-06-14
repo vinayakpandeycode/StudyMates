@@ -1,4 +1,4 @@
-StudyMates - Intelligent Peer Collaboration for Academic Success
+PeerRoom- Intelligent Peer Collaboration for Academic Success
 A platform that helps you find the right study partners.
 🚀 Project Description
 StudyMates is a web-based application specifically designed to help university students form effective study groups. It connects students based on their academic year, subjects or specialization, and desired group size. A secure ID verification process is also included to ensure authentic student participation.
